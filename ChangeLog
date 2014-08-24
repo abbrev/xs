@@ -1,0 +1,335 @@
+2003-02-16  Mark Riley <markril@users.sourceforge.net>
+
+  * Improvements to high memory Patch 638513
+  * Improved motor handler to allow full speed operation.  Previously,
+    every 256ms the outputs would float for 1ms when setting the motor
+    speed to maximum: motor_a_speed(MAX_SPEED)
+  * Moved motor handler to high memory
+
+2003-02-13  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Applied Patches.  For more detail on each, see the closed
+    patches still on file at the brickOS sourceforge project web
+  * Applied Patch 638513: Make use of high memory (Mech. only)
+     (the patch moved mm routines to high mem. This is not 
+	  yet decided, so no routines are moved, yet.)
+  * Applied Patch 651692: Add setjmp/longjmp (ANSI C support)
+  * Applied Patch 668115: Make brickOS work with up-to-date binutils
+  * Applied Patch 673995: Patch brickos 0.2.6.09 for *BSD
+  * Fixed bug 666378: Motors still running when RCX turned off
+     (applied fix described in bug report at site.)
+
+2003-01-11  Ed Manlove <emanlove@users.sourceforge.net>
+
+  * Modified makedepend to $(MAKEDEPEND) in lib/*/Makefiles
+
+2002-12-13  Joseph A Woolley <jawoolley@users.sourceforge.net>
+
+  * Update system time so that motor controller is called every 1ms 
+    as in previous version
+
+2002-11-07  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Adjusted configure to prevent false detect of directory as compiler
+
+2002-10-22  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Converted Makefile.common and rest of makefiles to
+    support the new ./configure utility
+  * Use of ./configure is now required
+
+2002-10-16  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Move Makefile.kernel into boot/Makefile (was only consumer)
+  * Finish install targets, add uninstall target
+  * Generate & install installed forms of included and demo 
+    makefiles (generate by filtering existing then installing)
+
+2002-10-15  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * 2nd pass at cleaning up Makefiles
+    - added build/install of all docs as targets separate
+	  from normal brickOS build/install
+	- enabled 'make tag' from top Makefile
+  * Install of headers and brickOS itself is all that remains
+    to be done in next make update
+  * Merge util/Makefile.common into top Makefile.common
+    - rework util/ Makefiles to use top Makefile.common
+
+2002-10-11  Joseph A Woolley <jawoolley@users.sourceforge.net>
+
+  * Added locked_increment and locked_decrement to inc/dec an
+    unsigned char value; interrupt safe.  Added
+    locked_check_and_increment function; used by 
+    enter_critical_section.
+  * Added critsec.c, critsec.h and sys/critsec.h to implement 
+    critical sections.
+  * Added a 'kernel critical section' that can be used in the
+    kernel to keep the task swapper from switching tasks.
+    This is a simple and 'cost effective' way to manage critical
+    resources.  This prevents a task from being killed while
+    in a critical region of code.  It also keeps two tasks
+    from modifying kernel structures at the same time.  This
+    replaces the use of semaphores which don't support nesting
+    and cannot be used while in the task manager while swapping.
+    A task should never yield, sleep or exit while in a critical
+    section; whether kernel or user level.
+  * Replaced semaphore in task manager with critical section.
+  * Replaced semaphore in memory manager with critical section.
+  * Added definitions for the Control Status Register (CSR) for
+    the Watch Dog Timer (WDT) and the Counter Register (CNT)
+    for the WDT.
+  * Seperated sys_time increment code from the systime_handler
+    and attached sys_time clock to the WDT.  This is 
+    configured to use the NMI, so clock should be more
+    accurate.  Named sys_time handler 'clock_handler'.
+  * Seperated sub-systems from task switcher in systime.c
+    and called sub-system handler 'subsystem_handler'.  The
+    sub-system handler will call the task switcher handler
+  * Named the task switcher handler 'task_switch_handler'.
+  * Attached task switcher handler to OCA of the 16 bit timer
+    and subsystem handler to OCB of the 16 bit timer.  The OCA
+    and OCB interrupts can be configured at different intervals,
+    however, they are linked.  The timer will reset on A, so
+    B will be delayed until A is reached, then the timer is 
+    reset and B can be reached again.  B must be less than A
+    or B will never be reached.  Currenty, A and B alternate
+    every msec.
+  * Adjusted the lnp_timeout_counter, auto_shutoff_counter, 
+    vis_refresh_counter and lcd_refresh_counter; (cut in half)
+    since the subsystem_handler is only called once every two
+    msecs.
+  * The task switcher is checked every msec since direct
+    modification of the timeslice counter can be used to tweak
+    task wake-up.  msleep currently does this to allow wakeup
+    to interrupt lower priority tasks mid-slice.
+  * Removed another static buffer used by LNP.  Instead, I
+    Added code to malloc and free the memory as needed.  Added
+    #ifdef blocks to resort back to static buffers if CONF_MM
+    is not defined.
+
+2002-10-11  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * First pass at cleaning up Makefiles by normalizing
+    subdirectory handling, and adding install targets.
+  * There are a couple more Makefiles to update before thie
+  	is done.
+
+2002-09-25  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Awakened API doc for Kernel Developers
+  * Added Demo pages to each API set
+  * Upgraded control files to New Doxygen Version
+
+2002-09-23  Joseph A Woolley <jawoolley@users.sourceforge.net>
+
+  * Removed static buffer in program.c that is used to copy
+    lnp packets.  Instead, malloc and free buffer as needed.
+
+2002-09-22  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * NEW add LEGO Lamp support for C++
+  * NEW added demo/c++/lampTest.C as example
+  * 2nd wave of API documentation updates
+
+2002-09-20  Joseph A Woolley <jawoolley@users.sourceforge.net>
+
+  * Added support for "safe-shutdown" of tasks.  Updated tm, mm,
+    program, semaphore and a few others.  Updated demos.
+  * Look in demo programs for examples of new code usage.
+
+2002-09-04  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * First wave of internal comment updates for Doxygen
+     extraction of API documentation
+	This round included (1) upgrade of Doxygen control files
+	(2) revision of file brief descriptions, and (3) excluding
+	of __asm__ code blocks from the generated HTML API docs.
+
+2002-09-01  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Remove legOS from Makefiles and doxygen files
+  * Add Linux/Debian support to Makefile.common
+  * Prep as 1st brickos test release
+
+2002-08-28  Joseph Woolley <jawoolley@users.sourceforge.net>
+  * Updated comments, code and data structures to refer to
+    tasks instead of threads and processes.
+  * Added menu choice for modifying LNP Host Address at
+    run-time.
+  * Added menu choice to delete current program.
+  * Added low priority task to animate man (while program
+    running) and to show/hide the battery low indicator.
+  * Updated execi and tm_switcher to keep a tally of the
+    number of kernel tasks at run-time.  This value is
+    used to determine if any user tasks are running.
+  * Updated comments from LegOS to BrickOS and from LegOS
+    Network Protocol to Link Network Protocol (unofficial)
+  * Fixed minor bug in mm_try_join for "end-of-memory"
+    condition.  Previously unchecked, the pointer would
+    wrap around into kernel memory; producing undefined
+    behaviour.
+  * Updated killall so only user tasks or all tasks are
+    killed.
+  * Added T_IDLE flag to indicate which task is the idle
+    task.  Removed now-unnecessary idle_task global
+    variable.
+  * Modified tm_sleep_wakeup so tasks will interupt lower
+    priority tasks when wakeup time is between time-slices.
+
+2002-08-21  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Changes to loader utils to support new internal name
+  * Changes to .lx image to contain brickos vs. legos
+  * Makefile changes to generate brickos files vs. legos
+
+2002-08-21  Ted Hess <thess@users.sourceforge.net>
+
+  * Allow setting LNP Host address at build or load-time
+    - Specify LNP_HOSTADDR=n on make command-line (0 .. N)
+    - Use dll option --node={hostaddress} or -n{hostaddress}
+    Note: CONF_LNP_HOSTADDR in config.h is now a small integer 
+	instead of shifted mask
+  * fix LEGOS_ROOT macro to work in sub-directory (makefile)
+  * added $CDEFINES macro for compile-time defines (makefile)
+  * minor fixes for various config option combinations to build properly
+  * added CMDsethost to dll protocol to set host addrs
+  * use Win32 device name for USB tower on Win32
+  * updated man page for new dll options
+
+2002-05-05  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Applied Patch #552135: RCX Remote control support + misc
+    fixes: animated figure (doesn't fidget anymore),
+    dll Program numbers now consistent (1 - 8), LCD display
+    of motor dir during braking now correct, cputc_native_xxx macros 
+    now allow expression as arg, and dll now allows delete of program.
+  * small adjustments to two demos
+  * This effectively removes the prior IR Remote implementation as
+    it is now a blend of the two patched approaches
+  * Added new config settings:
+     CONF_RCX_PROTOCOL    // RCX protocol handler (lnp)
+     CONF_LR_HANDLER      // Remote control button event dispatcher
+     CONF_RCX_MESSAGE     // Standard firmare message functions
+    Which replaced the following settings:
+     CONF_REMOTE_CTRL      // remote control
+     CONF_RKEY_HANDLER     // remote control keys handler
+     CONF_RKEY_MOTOR       // remote control motor
+     CONF_MESSAGE          // standard firmware message
+
+2002-04-28  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Added Motor control to complete implementation of
+    Patch #475185: Remote Control & Standard Message Patch
+  * Cleaned up Makefile.user targets (much more to do)
+
+2002-04-26  Paolo Masetti <paolom@users.sourceforge.net>
+
+  * demo/c++:  Added .cvsignore file
+
+2002-04-23  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Apply Patch #475185: Remote Control & Standard Message Patch
+  * Move from NUM_SYSTEM_THREADS to NUM_SYSTEM_TASKS
+
+2002-04-22  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Apply Patch #403527: LNP checksum optimizations
+  * Apply Patch #403728: LNP optimizations versus CVS
+  * Apply Patch #545860: race conditions fix in LNP
+
+2002-04-19  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Version number bump to 0.2.6 - Official Release
+  * Moved some ChangeLog content to NEWS, updates in NEWS
+  * Updated CONTRIBUTERS
+  * Removed some old text from TODO, added new
+
+2002-04-17  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Version number bump to 0.2.5.3 - next release candidate
+  * README: added version number to directory name in instru.
+  * Makefile:  Added cygwin on WinXP detection (in util dir)
+  * Makefile:  added remove of dll-src/.depend on clean
+
+2002-04-17  Paolo Masetti <paolom@users.sourceforge.net>
+
+  * Makefile:  Added cygwin on WinXP detection
+  * lnp.c:   fixed a problem vs lnp.h
+  * dsensor.c: fixed a badly formatted comment/syntax error
+
+2002-04-11  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Makefile: Added TODO to list of files in distribution
+    (missed it on first attempt)
+  * Add HOWTO source to complete addition of docs for this release
+  * Version number bump to 0.2.5.2 - next release candidate
+
+2002-04-08  Paolo Masetti <paolom@users.sourceforge.net>
+
+  * rcxtty.c: Parity patch by Michael Obenland <obenland@t-online.de>
+
+2002-04-04  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * Makefile.Common: Added HMSTOOLDIR so Debian GNU/Linux users
+     can build the code with:  export HMSTOOLDIR=/usr;make -e
+  * TODO, NEWS, README, VERSION  updating in prep for release
+
+2002-04-01  Paolo Masetti <paolom@users.sourceforge.net>
+
+  * Makefile.Common: Using $(shell uname) if $OSTYPE is undefined
+  * Cygwin B-20 / Cygwin 1.x: Added support for both environment
+     with some limitation for B-20 (printf.c)
+  * utils: Changed Makefile avoiding duplicate generation of
+     executables
+  * firmdl3 / dll: Added USB support (WIN32)
+    Patches by Hary D. Mahesan 09/27/01
+    <hmahesan@hotmail.com>
+    <hdmahesa@engmail.uwaterloo.ca>
+      Edited & CVS merged by paolom
+
+2002-03-30  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * THIS IS A COLLECTION OF ALL CHANGES IN CVS since 0.2.5
+     it therefore does not reflect who did the work and when
+     in the future we will -Stephen
+  * Fix BUG #228723: makelx out-of-bounds check bad on c++
+  * Fix BUG #226789: Remove -u use to fix build on BSD
+  * Added Manpage source files dll.1 & firmdl3.1
+  * Add C++ TemperatureSensor Class
+  * Add 3 new C++ demos:
+     rotation.velocity.Sensor.C
+     temperatureSensor.C
+     touch.pressed.Sensor.C
+  * dll: add default of /dev/ttyb for Sun (serial port B)
+  * dll: added -d switch to display sizes during run
+  * util/dll-src/Makefile:  remove need for symlink in tarball
+     (symlinks not supported in Packaging for Debian)
+     also simplify compile rules
+  * Add cmpsi2.c/ucmpsi2.c to lib/mint/Makefile, version the new files
+  * Add printf.c to lib/c/Makefile, version printf.c source file
+  * In kernel/program.c: Added free memory and batter life display
+     Press "view" repeatedly while no programs are running to see
+  * Add NUM_SYSTEM_THREADS def & mod files to use DEF vs. literal
+  * In sys/mm.c/h: add int mm_free_mem(void); function
+  * TouchSensor class: added pressed() member
+  * RotationSensor.H: added CONF_DSENSOR_VELOCITY wraps
+  * C++: motorPair.C/H methods renamed to lower case, demos adjusted
+  * C++: motor.C/H methods renamed to lower case, demos adjusted
+  * Minor changes to internal comments containing source file name
+  * .PHONEY and c++ make targets added to demo/Makefile
+  * .PHONEY and c++ make targets added to Makefile
+  * README was updated to 0.2.5 after release (oops)
+  * Added Cygwin 1.1 make target support
+  * DOXYGEN: Added API generation support using Doxygen
+     Added doxygen API docs build/clean make-targets to Makefile
+     Updated Doxygen files to work with newer Doxygen version
+     Revise insternal comments for c/C++ classes so API reads better
+     Add DOXYGEN_SHOULD_SKIP_INTERNALS flags to misc source
+     Add C and C++ Doxygen control files
+
+2002-03-29  Stephen M Moraco <stephmo@users.sourceforge.net>
+
+  * creating this file after 0.2.5 release
+--
+$Id: ChangeLog,v 1.26 2003/02/16 20:43:48 markril Exp $

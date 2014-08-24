@@ -1,0 +1,12 @@
+cmpsi2.o: cmpsi2.c
+divhi3.o: divhi3.c
+modhi3.o: modhi3.c
+mulhi3.o: mulhi3.c
+udivhi3.o: udivhi3.c
+umodhi3.o: umodhi3.c
+divsi3.o: divsi3.c
+modsi3.o: modsi3.c
+mulsi3.o: mulsi3.c
+ucmpsi2.o: ucmpsi2.c
+udivsi3.o: udivsi3.c
+umodsi3.o: umodsi3.c

@@ -1,0 +1,79 @@
+helloworld.o: helloworld.c /home/lab4/yuasa/legOS/brick/include/conio.h \
+  /home/lab4/yuasa/legOS/brick/boot/config.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/lcd.h \
+  /home/lab4/yuasa/legOS/brick/include/rom/lcd.h \
+  /home/lab4/yuasa/legOS/brick/include/dlcd.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/bitops.h \
+  /home/lab4/yuasa/legOS/brick/include/dkey.h \
+  /home/lab4/yuasa/legOS/brick/include/tm.h \
+  /home/lab4/yuasa/legOS/brick/include/mem.h \
+  /home/lab4/yuasa/legOS/brick/include/unistd.h \
+  /home/lab4/yuasa/legOS/brick/include/time.h
+linetrack.o: linetrack.c /home/lab4/yuasa/legOS/brick/boot/config.h \
+  /home/lab4/yuasa/legOS/brick/include/conio.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/lcd.h \
+  /home/lab4/yuasa/legOS/brick/include/rom/lcd.h \
+  /home/lab4/yuasa/legOS/brick/include/dlcd.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/bitops.h \
+  /home/lab4/yuasa/legOS/brick/include/dkey.h \
+  /home/lab4/yuasa/legOS/brick/include/tm.h \
+  /home/lab4/yuasa/legOS/brick/include/mem.h \
+  /home/lab4/yuasa/legOS/brick/include/unistd.h \
+  /home/lab4/yuasa/legOS/brick/include/time.h \
+  /home/lab4/yuasa/legOS/brick/include/dsensor.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/h8.h \
+  /home/lab4/yuasa/legOS/brick/include/dmotor.h
+memtest.o: memtest.c /home/lab4/yuasa/legOS/brick/include/conio.h \
+  /home/lab4/yuasa/legOS/brick/boot/config.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/lcd.h \
+  /home/lab4/yuasa/legOS/brick/include/rom/lcd.h \
+  /home/lab4/yuasa/legOS/brick/include/dlcd.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/bitops.h \
+  /home/lab4/yuasa/legOS/brick/include/dkey.h \
+  /home/lab4/yuasa/legOS/brick/include/tm.h \
+  /home/lab4/yuasa/legOS/brick/include/mem.h \
+  /home/lab4/yuasa/legOS/brick/include/dsound.h \
+  /home/lab4/yuasa/legOS/brick/include/time.h \
+  /home/lab4/yuasa/legOS/brick/include/unistd.h \
+  /home/lab4/yuasa/legOS/brick/include/stdlib.h
+robots.o: robots.c /home/lab4/yuasa/legOS/brick/boot/config.h \
+  /home/lab4/yuasa/legOS/brick/include/dsound.h \
+  /home/lab4/yuasa/legOS/brick/include/time.h \
+  /home/lab4/yuasa/legOS/brick/include/unistd.h \
+  /home/lab4/yuasa/legOS/brick/include/tm.h \
+  /home/lab4/yuasa/legOS/brick/include/mem.h
+rover.o: rover.c /home/lab4/yuasa/legOS/brick/boot/config.h \
+  /home/lab4/yuasa/legOS/brick/include/conio.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/lcd.h \
+  /home/lab4/yuasa/legOS/brick/include/rom/lcd.h \
+  /home/lab4/yuasa/legOS/brick/include/dlcd.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/bitops.h \
+  /home/lab4/yuasa/legOS/brick/include/dkey.h \
+  /home/lab4/yuasa/legOS/brick/include/tm.h \
+  /home/lab4/yuasa/legOS/brick/include/mem.h \
+  /home/lab4/yuasa/legOS/brick/include/unistd.h \
+  /home/lab4/yuasa/legOS/brick/include/time.h \
+  /home/lab4/yuasa/legOS/brick/include/dsensor.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/h8.h \
+  /home/lab4/yuasa/legOS/brick/include/dmotor.h
+sound.o: sound.c /home/lab4/yuasa/legOS/brick/boot/config.h \
+  /home/lab4/yuasa/legOS/brick/include/dsound.h \
+  /home/lab4/yuasa/legOS/brick/include/time.h \
+  /home/lab4/yuasa/legOS/brick/include/unistd.h \
+  /home/lab4/yuasa/legOS/brick/include/tm.h \
+  /home/lab4/yuasa/legOS/brick/include/mem.h
+trailerbot.o: trailerbot.c /home/lab4/yuasa/legOS/brick/boot/config.h \
+  /home/lab4/yuasa/legOS/brick/include/conio.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/lcd.h \
+  /home/lab4/yuasa/legOS/brick/include/rom/lcd.h \
+  /home/lab4/yuasa/legOS/brick/include/dlcd.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/bitops.h \
+  /home/lab4/yuasa/legOS/brick/include/dkey.h \
+  /home/lab4/yuasa/legOS/brick/include/tm.h \
+  /home/lab4/yuasa/legOS/brick/include/mem.h \
+  /home/lab4/yuasa/legOS/brick/include/stdlib.h \
+  /home/lab4/yuasa/legOS/brick/include/unistd.h \
+  /home/lab4/yuasa/legOS/brick/include/time.h \
+  /home/lab4/yuasa/legOS/brick/include/dmotor.h \
+  /home/lab4/yuasa/legOS/brick/include/dsensor.h \
+  /home/lab4/yuasa/legOS/brick/include/sys/h8.h

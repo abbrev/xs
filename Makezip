@@ -1,0 +1,2 @@
+rm -f ../zips/xs.zip
+zip -r ../zips/xs.zip *

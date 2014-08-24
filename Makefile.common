@@ -1,0 +1,175 @@
+### ==========================================================================
+###  $Id: Makefile.common,v 1.17 2003/02/14 06:03:17 stephmo Exp $
+###  FILE: Makefile.common - definitions common to most brickOS Makefiles
+###  brickOS - the independent LEGO Mindstorms OS
+### --------------------------------------------------------------------------
+###         (this file is included by other brickOS Makefiles)
+
+#
+#  Define our default install locations (overridden by packaging systems)
+#
+
+# Taiichi changed the values of TOOLPREFIX & BRICKOS_ROOT.
+# Taiichi commented out "ensureConfigured".
+
+prefix = /usr/local
+exec_prefix = ${prefix}
+PACKAGE = brickos
+
+bindir = ${exec_prefix}/bin
+sbindir = ${exec_prefix}/sbin
+libexecdir = ${exec_prefix}/lib
+datadir = ${prefix}/share
+docdir = ${prefix}/share/doc
+sysconfdir = ${prefix}/etc
+sharedstatedir = ${prefix}/com
+localstatedir = ${prefix}/var
+libdir = ${exec_prefix}/lib
+mandir = ${prefix}/man
+includedir = ${prefix}/include
+
+pkgdatadir = $(datadir)/${PACKAGE}
+pkglibdir = $(libdir)/${PACKAGE}
+pkgincludedir = $(includedir)/${PACKAGE}
+pkgdocdir = $(docdir)/${PACKAGE}
+pkghtmldir = $(pkgdocdir)/html
+pkgexampledir = $(pkgdocdir)/examples
+
+
+#
+#  BEGIN-configuration insert (do not remove this line)
+# -------------------------------------------------------
+# Taiichi (
+#TOOLPREFIX=/usr/h8300-hitachi-hms/bin/h8300-hitachi-hms-
+TOOLPREFIX=/usr/local/bin/h8300-hms-
+# )
+SED_SFLAG=
+EXT=
+CC=cc
+CFLAGS=-O2 -Wall
+MAKEDEPEND=$(CC) -M
+# Taiichi (
+#BRICKOS_ROOT=
+#BRICKOS_ROOT=/home/jkf/brick/brickos-0.2.6.10
+BRICKOS_ROOT=/home/lab4/yuasa/legOS/brick
+# )
+# -------------------------------------------------------
+#  END-configuration insert  (do not remove this line)
+#
+
+#
+#  test to ensure that user has run configure before building
+#
+# Taiichi (
+#all depend:: ensureConfigured
+all depend:: # ensureConfigured
+# )
+
+ensureConfigured:
+	@if [ ! -f $(BRICKOS_ROOT)/.configured.flg ]; then \
+		echo "" >&2; \
+		echo "ERROR- brickOS builds are not yet configured..." >&2; \
+		echo " Please run ./configure then re-attempt this build." >&2; \
+		echo "" >&2; \
+		exit 2; \
+	fi
+
+
+#
+#  select purpose based on building hosted utilities or brickOS and demos
+#
+ifdef BUILDING_HOST_UTILS
+# ----------------------------------------------------------------------------
+#   defines for build of native compiled utilities
+# ----------------------------------------------------------------------------
+
+CFLAGS+=-O2 -Wall
+
+else  # ifndef BUILDING_HOST_UTILS
+
+# ----------------------------------------------------------------------------
+#   defines for build of cross-compiled parts: brickOS, demos
+# ----------------------------------------------------------------------------
+
+# options
+COPT  =-O2 -fno-builtin -fomit-frame-pointer
+CWARN =-Wall
+#
+# 2000.03.12 - Paolo Masetti <paolo.masetti@itlug.org>
+#
+#	- Added -I$(BRICKOS_ROOT)/include/lnp in respect of
+#	  Martin Corneluis (cornelius@csd.de) fix for lnp includes
+#	  see http://www.lugnet.com/robotics/rcx/legos/?n=498 for details
+#
+CINC  =-I$(BRICKOS_ROOT)/include -I$(BRICKOS_ROOT)/include/lnp -I.
+
+CFLAGS=$(COPT) $(CWARN) $(CINC) $(CDEFINES)
+CXXFLAGS=-DCXX $(CFLAGS)
+
+##
+## older options
+##
+
+# do we need to pad the srec file with zeros?
+#NEED_ZERO_PADDING=--pad-to 0xC000
+
+# how to disassemble
+ODFLAGS = --disassemble-all --no-show-raw-insn -m h8300
+
+# which firmware version to act upon
+FIRMVERS=firm0309
+
+
+##
+## no user servicable parts below
+##
+
+AS=$(TOOLPREFIX)as
+AR=$(TOOLPREFIX)ar
+LD=$(TOOLPREFIX)ld
+NM=$(TOOLPREFIX)nm
+OBJCOPY=$(TOOLPREFIX)objcopy
+OBJDUMP=$(TOOLPREFIX)objdump
+CC=$(TOOLPREFIX)gcc
+CXX=$(TOOLPREFIX)g++
+
+MERGEMAP	=$(BRICKOS_ROOT)/util/merge-map
+GENLDS 	=$(BRICKOS_ROOT)/util/genlds
+FIXDEPS	=$(BRICKOS_ROOT)/util/fixdeps
+MAKELX	=$(BRICKOS_ROOT)/util/makelx
+MAKEDEPEND	=$(CC) -M $(CINC)
+
+###
+### generic rules
+###
+
+# how to assemble
+%.o: %.s
+	$(AS) $< -o $@
+
+# how to compile C source
+%.o: %.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# how to compile C kernel sources
+%.o: $(BRICKOS_ROOT)/kernel/%.c
+	$(CC) $(CFLAGS) -c $< -o $@
+
+# how to generate an assembly listing of a kernel source
+%.s: $(BRICKOS_ROOT)/kernel/%.c
+	$(CC) $(CFLAGS) -c $< -S
+
+# how to compile C++ source
+%.o: %.cpp
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+%.o: %.C
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+#
+#
+
+endif  # ifndef BUILDING_HOST_UTILS
+
+### --------------------------------------------------------------------------
+###                         End of FILE: Makefile.common
+### ==========================================================================

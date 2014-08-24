@@ -1,0 +1,14 @@
+OBJS = loader.obj rcxtty.obj lnp.obj lx.obj getopt.obj getopt_long.obj \
+       extra.obj winkeep.obj
+
+dll.exe: $(OBJS)
+	cl /Zi /Fedll.exe /MD $(OBJS)
+
+
+.c.obj:
+	cl /c /Zi  /MD /DNative_Win32 /I. /I../../include/lnp $<
+
+
+
+clean:
+	cmd /c del $(OBJS)

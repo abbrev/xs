@@ -1,0 +1,20 @@
+OBJS = mkimg.obj srec.obj fastdl.h firmdl.obj rcx_comm.obj extra.c
+
+firmdl3.exe: fastdl.h firmdl.obj srec.obj rcx_comm.obj extra.obj
+	cl /Fefirmdl3.exe firmdl.obj srec.obj rcx_comm.obj extra.obj
+
+
+mkimg.exe: mkimg.obj srec.obj
+	cl /Femkimg.exe /MD mkimg.obj srec.obj 
+
+fastdl.h: mkimg.exe fastdl.srec
+	mkimg fastdl.srec > fastdl.h
+
+
+.c.obj:
+	cl /c /Zi  /MD /DNative_Win32 /I. /I../../win-include/lnp $<
+
+
+
+clean:
+	cmd /c del $(OBJS)

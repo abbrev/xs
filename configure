@@ -1,0 +1,183 @@
+#!/bin/bash -p
+# $Id: configure,v 1.8 2002/11/07 19:00:11 stephmo Exp $
+#
+# Generator for brickOS host-OS-dependend Makefile variables
+#
+# 15.10.02	-	Version 1.0		M. Obenland
+#										obenland@t-online.de
+#
+# 21.10.02	-	Version 1.0	Updates	  S. Moraco
+#										stephen@debian.org
+#
+# 31.10.02  -  Version 1.0a Changed name seperation routine
+#                           to use dirname / basename to handle
+#                           'gcc' in pathname    M. Obenland
+#                           obenland@t-online.de
+#
+
+echo ""
+echo "Welcome to the brickOS Makefile configurator."
+echo "Attempting to find the Hitachi gcc compiler. (This may take some time.)"
+echo ""
+
+#
+#  check for known files in known locations, first,
+#    so can avoid expensive search
+#
+#   known PATHs in which h8*gcc may be found
+TOOL_PATH[0]="/usr/local/bin";
+TOOL_PATH[1]="/usr/h8300-hitachi-hms/bin";
+TOOL_PATH[2]="/usr/local/crossgcc/h8300-hitachi-hms/bin";
+
+#   known PREFIXs of h8*gcc
+TOOL_PREFIX[0]="h8300-hms-";
+TOOL_PREFIX[1]="h8300-hitachi-hms-";
+
+HMSFULL=""
+pathIndex=0
+#  for each path, do...
+while test $pathIndex -lt ${#TOOL_PATH[*]}
+do
+  prefixIndex=0
+  #  for each basename prefix. do...
+  while test $prefixIndex -lt ${#TOOL_PREFIX[*]}
+  do
+    GCCBASE="${TOOL_PATH[$pathIndex]}/${TOOL_PREFIX[$prefixIndex]}gcc"
+    #  for each suffix (.exe and empty str), do...
+    for EXT in ".exe" ""
+    do
+      GCCFSPEC="${GCCBASE}$EXT"
+      if test -f "$GCCFSPEC"
+      then
+        HMSFULL="$GCCFSPEC"
+        break  #  have answer, exit inner loop
+      fi
+    done
+    if test -n "$HMSFULL"
+    then
+      break  #  have answer, exit middle
+    fi
+    prefixIndex="`expr $prefixIndex + 1`"  #  increment our prefixIndex
+  done
+  if test -n "$HMSFULL"
+  then
+    break  #  have answer, exit outer loop
+  fi
+  pathIndex="`expr $pathIndex + 1`"  #  increment our pathIndex
+done
+
+
+#
+#  if didn't find in expected location...
+#   search filesystem for full name of hitachi gcc compiler and path
+#
+if test -z "$HMSFULL"
+then
+  HMSFULL=`find / -type f \( -name 'h8*gcc' -o -name 'h8*gcc.exe' \) -print`
+fi
+
+#
+# if no compiler is found, exit
+#
+if test -z "$HMSFULL"
+then
+   echo "No hitachi gcc compiler found, please install compiler and try again."
+   exit 1
+fi
+
+#
+# Toolprefix is full path and compiler name without 'gcc'
+#
+DIRNAME=`dirname $HMSFULL`
+BASENAME=`basename $HMSFULL`
+
+TOOLPREFIX=$DIRNAME/$(echo $BASENAME | sed "s/gcc.*//")
+
+echo " - Toolprefix = "$TOOLPREFIX
+
+#
+#  look for .exe in the compiler name. This indicates Windows environment
+#   which means that CYGWIN or DJGPP toolset is being used
+#
+case "$HMSFULL" in
+*.exe)
+	   echo " - Found Cygwin/DJGPP system"
+       SED_SFLAG=1
+       EXT=.exe
+       CC=gcc
+       CFLAGS=-D_WIN32
+	   CFLG_PE='+'
+	   ;;
+
+*)
+	   echo " - Found Linux/Unix system"
+       SED_SFLAG=""
+       EXT=""
+       CC=cc
+       CFLAGS="-O2 -Wall"
+	   CFLG_PE=""
+	   ;;
+esac
+echo ""
+
+MAKEDEPEND="\$(CC) -M"
+BRICKOS_ROOT=`pwd`
+
+CURR_MAKEFILE=Makefile.common
+NEW_MAKEFILE=${CURR_MAKEFILE}.new
+PRIOR_MAKEFILE=${CURR_MAKEFILE}.bak
+
+cat $CURR_MAKEFILE | awk -v sedFlag=$SED_FLAG \
+                          -v ext=$EXT \
+						  -v cc=$CC \
+						  -v cflags="$CFLAGS" \
+						  -v toolPrefix="$TOOLPREFIX" \
+						  -v mkdep="$MAKEDEPEND" \
+						  -v brickosRoot=$BRICKOS_ROOT \
+						  -v cflgPleq=$CFLG_PE \
+						  '
+						  BEGIN {
+						    inInsert=0
+							sep="# -------------------------------------------------------"
+						  }
+						  ($2 == "END-configuration") {
+						    inInsert=0
+							print sep
+							print "TOOLPREFIX=" toolPrefix
+							print "SED_SFLAG=" sedFlag
+							print "EXT=" ext
+							print "CC=" cc
+							print "CFLAGS" cflgPleq "=" cflags
+							print "MAKEDEPEND=" mkdep
+							print "BRICKOS_ROOT=" brickosRoot
+							print sep
+						  }
+						  (inInsert) {
+						  	next
+						  }
+						  ($2 == "BEGIN-configuration") {
+						    inInsert=1
+						  }
+						  {
+						  	print $0
+						  }
+						  END {
+						  }' >$NEW_MAKEFILE
+
+cmp -s $CURR_MAKEFILE $NEW_MAKEFILE
+RET_CODE=$?
+if test $RET_CODE == 1
+then
+	rm -f $PRIOR_MAKEFILE
+	mv $CURR_MAKEFILE $PRIOR_MAKEFILE
+	mv $NEW_MAKEFILE $CURR_MAKEFILE
+else
+	rm -f $NEW_MAKEFILE
+	echo "configure: no configuration changes needed, nothing done."
+	echo ""
+fi
+
+touch .configured.flg	#  tell Make system we are now configured
+
+exit 0
+

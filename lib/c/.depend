@@ -1,0 +1,7 @@
+memcpy.o: memcpy.c
+memset.o: memset.c
+strcmp.o: strcmp.c
+strcpy.o: strcpy.c
+strlen.o: strlen.c
+random.o: random.c
+printf.o: printf.c
